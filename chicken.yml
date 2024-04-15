@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chickendeploy
+  labels:
+    app: chick
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chick
+  template:
+    metadata:
+      labels:
+        app: chick
+    spec:
+      containers:
+      - name: chickencont
+        image: z4l4n/chicken_club:1.0
+        ports:
+          - containerPort: 8082
+        env:
+            - name: SPRING_APPLICATION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: configmapila
+                  key: SPRING_APPLICATION_CHICK_NAME
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chickservice
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: chick
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
